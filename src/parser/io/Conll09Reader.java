@@ -101,6 +101,11 @@ public class Conll09Reader extends DependencyReader {
 	    
 		return new DependencyInstance(forms, lemmas, cpos, pos, feats, heads, deprels);
 	}
+        
+        @Override
+        public DependencyInstance nextInstanceWithFarasa() throws IOException {
+            return new DependencyInstance();
+        } 
 
 	@Override
 	public boolean IsLabeledDependencyFile(String file) throws IOException {
@@ -108,4 +113,3 @@ public class Conll09Reader extends DependencyReader {
 	}
 
 }
-

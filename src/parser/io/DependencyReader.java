@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 import parser.DependencyInstance;
 import parser.Options;
@@ -14,6 +15,7 @@ public abstract class DependencyReader {
 	BufferedReader reader;
 	boolean isLabeled;
 	Options options;
+        ArrayList<String> conlllines;
 	
 	public static DependencyReader createDependencyReader(Options options) {
 		String format = options.format;
@@ -30,11 +32,18 @@ public abstract class DependencyReader {
 	}
 	
 	public abstract DependencyInstance nextInstance() throws IOException;
+        public abstract DependencyInstance nextInstanceWithFarasa() throws IOException;
 	public abstract boolean IsLabeledDependencyFile(String file) throws IOException;
 	
 	public boolean startReading(String file) throws IOException {
 		isLabeled = IsLabeledDependencyFile(file);
 		reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF8"));
+		return isLabeled;
+	}
+        
+        public boolean startReading(ArrayList<String> conll06lines) throws IOException {
+		isLabeled = IsLabeledDependencyFile(" ");
+                conlllines = conll06lines;
 		return isLabeled;
 	}
 	

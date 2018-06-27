@@ -1,22 +1,24 @@
 package parser;
 
-import java.io.BufferedWriter;
+//import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
+//import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import parser.Options.LearningMode;
 import parser.decoding.DependencyDecoder;
+import parser.io.DependencyGraphCreator;
 import parser.io.DependencyReader;
 import parser.io.DependencyWriter;
 import parser.pruning.BasicArcPruner;
-import parser.sampling.RandomWalkSampler;
+//import parser.sampling.RandomWalkSampler;
 
 public class DependencyParser implements Serializable {
 	
@@ -26,7 +28,7 @@ public class DependencyParser implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	
-	protected Options options;
+	public Options options;
 	protected DependencyPipe pipe;
 	protected Parameters parameters;
 	
@@ -150,8 +152,11 @@ public class DependencyParser implements Serializable {
 	
     public void loadModel() throws IOException, ClassNotFoundException 
     {
+//        ObjectInputStream in = new ObjectInputStream(
+//                new GZIPInputStream(new FileInputStream(options.modelFile))); 
+        //System.out.println("Loading : "+this.getClass().getClassLoader().getResourceAsStream(options.modelFile));
         ObjectInputStream in = new ObjectInputStream(
-                new GZIPInputStream(new FileInputStream(options.modelFile)));    
+                new GZIPInputStream(this.getClass().getClassLoader().getResourceAsStream(options.modelFile)));
         pipe = (DependencyPipe) in.readObject();
         parameters = (Parameters) in.readObject();
         options = (Options) in.readObject();
@@ -397,6 +402,93 @@ public class DependencyParser implements Serializable {
     		if (inst.heads[i] == pred.heads[i] && inst.deplbids[i] == pred.deplbids[i]) ++nCorrect;
     	}    		
     	return nCorrect;
+    }
+    
+    public ArrayList<String> classifySentences(boolean output, ArrayList<String> conll06lines) throws IOException {
+        ArrayList<String> inst_lines = new ArrayList<>();
+ 
+        if (pruner != null) pruner.resetPruningStats();
+        DependencyReader reader = DependencyReader.createDependencyReader(options);
+        reader.startReading(conll06lines);
+        //DependencyWriter writer = null;
+        DependencyGraphCreator graphCreator = null;
+        
+//        if (output && options.outFile != null) {
+//    		writer = DependencyWriter.createDependencyWriter(options, pipe);
+//    		writer.startWriting(options.outFile);
+//    	}
+        
+        if (options.graph) {
+            graphCreator = DependencyGraphCreator.createDependencyGraph(options, pipe);
+            graphCreator.startCreatingGraph("");
+    		
+    	}
+        
+        DependencyDecoder decoder = DependencyDecoder.createDependencyDecoder(options);
+        DependencyInstance inst = pipe.createInstanceWithFarasa(reader);
+        
+        while (inst != null) {
+            LocalFeatureData lfd = new LocalFeatureData(inst, this, true);
+            GlobalFeatureData gfd = new GlobalFeatureData(lfd); 
+            
+            DependencyInstance predInst = decoder.decode(inst, lfd, gfd, false);
+            if (options.learnLabel)
+            	lfd.predictLabels(predInst.heads, predInst.deplbids, false);
+            
+            //eval.add(inst, predInst, evalWithPunc);
+    		
+//    		if (writer != null) {
+//    			inst.heads = predInst.heads;
+//    			inst.deplbids = predInst.deplbids;
+//    			writer.writeInstance(inst);
+//    		}
+                ////////////////////////////
+                String[] forms = inst.forms;
+		String[] lemmas = inst.lemmas;
+		String[] cpos = inst.cpostags;
+		String[] pos = inst.postags;
+                String[][] feats = inst.feats;
+		int[] heads = predInst.heads;
+		int[] labelids = predInst.deplbids;
+                
+                String[] labels = pipe.types;
+		
+	    // 3 eles ele pron pron-pers M|3P|NOM 4 SUBJ _ _
+	    // ID FORM LEMMA COURSE-POS FINE-POS FEATURES HEAD DEPREL PHEAD PDEPREL
+            
+		for (int i = 1, N = inst.length; i < N; ++i) {
+                    String tmp = i + "\t"; 
+                    //writer.write(i + "\t");
+                    tmp += forms[i] + "\t";
+                    tmp += (lemmas != null && lemmas[i] != "" ? inst.lemmas[i] : "_") + "\t";
+                    tmp += cpos[i] + "\t";
+                    tmp += pos[i] + "\t";
+                    tmp += feats[i][0]+"\t";
+                    tmp += feats[i][1]+"\t";
+                    tmp += feats[i][2]+"\t";
+                    tmp += heads[i] + "\t";
+                    tmp += labels[labelids[i]]; //+ "\t_\t_";
+                    inst_lines.add(tmp);
+		}
+                
+                
+                
+                ////////////////////////////
+                
+                if (graphCreator != null) {
+    			inst.heads = predInst.heads;
+    			inst.deplbids = predInst.deplbids;
+    			String img_name = graphCreator.createGraphForInstance(inst);
+                        inst_lines.add(img_name);
+    		}
+                inst_lines.add("");
+    		
+    		inst = pipe.createInstanceWithFarasa(reader);
+        }
+        reader.close();
+    	//if (writer != null) writer.close();
+        if (graphCreator != null) graphCreator.close();
+        return inst_lines;
     }
     
     public double evaluateSet(boolean output, boolean evalWithPunc)

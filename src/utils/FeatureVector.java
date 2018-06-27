@@ -249,4 +249,3 @@ class Entry {
 		this.value = value;
 	}
 }
-

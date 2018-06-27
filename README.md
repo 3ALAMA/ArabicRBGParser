@@ -1,30 +1,26 @@
 
-### RBGParser v1.1
+### Arabic Dependency Parser
 
-This version improves parsing speed using the hash kernel (see [4]) and by optimizing the code. We also improved the unlabeled attachment score (UAS) slightly and labeled attachment score (LAS) significantly. 
+This project provides an Arabic Dependency Parser trained on data processed by [Farasa toolkit](http://farasa.qcri.org) using [MIT RBGParser v1.1](https://github.com/taolei87/RBGParser).
+For more details about the RBGParser v1.1 See [Readme.md]](https://github.com/taolei87/RBGParser)
 
-<br>
-#### [Quick Start](https://github.com/taolei87/RBGParser/wiki/Quick-Start)
+### Use Arabic Dependency Parser
 
-<br>
-#### [FAQs](https://github.com/taolei87/RBGParser/wiki/FAQs)
+To run the project from the command line, go to the dist folder and
+type the following:
 
-======
+	java -jar "RBGParserWrapper.jar" -i <inputFile> -o <outputFile>
 
-#### About and Contact
+For more details about using the Parser:
 
-This project is developed at Natural Language Processing group in MIT. It contains a Java implementation of a syntactic dependency parser with tensor decomposition and greedy decoding, described in [1,2,3].
+	java -jar "RBGParserWrapper.jar" -h
 
-This project is implemented by Tao Lei (taolei [at] csail.mit.edu) and Yuan Zhang (yuanzh [at] csail.mit.edu).
 
-=========
+### Requirements
 
-#### References
+The Dependency Parser used [Farasa Arabic Segmenter](http://farasa.qcri.org) and [Farasa Arabic POS Tagger](http://farasa.qcri.org). Download the tools and place the jars "FarasaSegmenterJar.jar" and "FarasaPOSJar.jar" in the "dict/lib" folders.
+Otherwise, for building the project from source. Place the jars in "libs" folder
 
-[1] Tao Lei, Yu Xin, Yuan Zhang, Regina Barzilay and Tommi Jaakkola. Low-Rank Tensors for Scoring Dependency Structures.  ACL 2014. [PDF](http://people.csail.mit.edu/taolei/papers/acl2014.pdf)
 
-[2] Yuan Zhang, Tao Lei, Regina Barzilay, Tommi Jaakkola and Amir Globerson. Steps to Excellence: Simple Inference with Refined Scoring of Dependency Trees.  ACL 2014. [PDF](http://people.csail.mit.edu/yuanzh/papers/acl2014.pdf)
 
-[3] Yuan Zhang\*, Tao Lei\*, Regina Barzilay and Tommi Jaakkola. Greed is Good if Randomized: New Inference for Dependency Parsing. EMNLP 2014. [PDF](http://people.csail.mit.edu/taolei/papers/emnlp2014.pdf)
 
-[4] Bernd Bohnet. Very High Accuracy and Fast Dependency Parsing is not a Contradiction. The 23rd International Conference on Computational Linguistics. COLING 2010. [PDF](http://anthology.aclweb.org/C/C10/C10-1011.pdf)

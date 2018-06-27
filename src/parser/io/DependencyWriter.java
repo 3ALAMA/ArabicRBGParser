@@ -13,6 +13,7 @@ public abstract class DependencyWriter {
 	Options options;
 	String[] labels;
 	boolean first, isLabeled;
+        int sentence_counter;
 	
 	public static DependencyWriter createDependencyWriter(Options options, DependencyPipe pipe) {
 		String format = options.format;
@@ -34,6 +35,7 @@ public abstract class DependencyWriter {
 		writer = new BufferedWriter(new FileWriter(file));
 		first = true;
 		isLabeled = options.learnLabel;
+                sentence_counter = 0;
 	}
 	
 	public void close() throws IOException {

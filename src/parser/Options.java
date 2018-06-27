@@ -20,6 +20,7 @@ public class Options implements Cloneable, Serializable {
 	public String testFile = null;
 	public String unimapFile = null;
 	public String outFile = null;
+        public boolean graph = true;
 	public boolean train = false;
 	public boolean test = false;
 	public boolean dev = false;
@@ -107,6 +108,7 @@ public class Options implements Cloneable, Serializable {
     		}
     		else if (arg.equals("test")) {
     			test = true;
+                        graph = false; //true;
     		}
     		else if (arg.equals("dev")) {
     			test = true;
@@ -268,4 +270,3 @@ public class Options implements Cloneable, Serializable {
     }
     
 }
-

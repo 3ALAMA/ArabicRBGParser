@@ -178,4 +178,3 @@ class ParseForestItem {
 		this.right = right;		
 	}
 }
-

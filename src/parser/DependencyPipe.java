@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -472,6 +473,18 @@ public class DependencyPipe implements Serializable {
 	    return inst;
     }
     
+        public DependencyInstance createInstanceWithFarasa(DependencyReader reader) throws IOException 
+    {
+    	
+    	DependencyInstance inst = reader.nextInstanceWithFarasa();
+    	if (inst == null) return null;
+    	
+    	inst.setInstIds(dictionaries, coarseMap, conjWord, options.lang);
+    			
+	    //createFeatures(inst);
+	    
+	    return inst;
+    }
     
     
     

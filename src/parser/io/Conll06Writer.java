@@ -10,6 +10,7 @@ public class Conll06Writer extends DependencyWriter {
 	
 	
 	public Conll06Writer(Options options, DependencyPipe pipe) {
+                
 		this.options = options;
 		this.labels = pipe.types;
 	}
@@ -44,6 +45,7 @@ public class Conll06Writer extends DependencyWriter {
 		}
 		
 		writer.write("\n");
+                sentence_counter++;
 	}
 
 }
