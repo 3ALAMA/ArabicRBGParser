@@ -1,6 +1,10 @@
 *.class
 
 # Package Files #
-*.jar
+Farasa*.jar
+RBGParserWrapper.jar
 *.war
 *.ear
+
+# Model files #
+arabic.model.farasa.107
