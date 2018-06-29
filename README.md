@@ -18,8 +18,8 @@ For more details about using the Parser:
 
 ### Requirements
 
-The Dependency Parser used [Farasa Arabic Segmenter](http://farasa.qcri.org) and [Farasa Arabic POS Tagger](http://farasa.qcri.org). Download the tools and place the jars "FarasaSegmenterJar.jar" and "FarasaPOSJar.jar" in the "dict/lib" folders.
-Otherwise, for building the project from source. Place the jars in "libs" folder
+The Dependency Parser uses [Farasa Arabic Segmenter](http://farasa.qcri.org) and [Farasa Arabic POS Tagger](http://farasa.qcri.org). Download the tools and place the jars "FarasaSegmenterJar.jar" and "FarasaPOSJar.jar" in the "./dist/lib" folders.
+Otherwise, for building the project from source. Place the jars in "./libs" folder
 
 
 
