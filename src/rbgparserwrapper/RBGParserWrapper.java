@@ -39,6 +39,9 @@ public class RBGParserWrapper {
     public static DependencyParser RBGParser;
     public static String[] RBGs;
     private static ArrayList<String>[] ResData;
+    
+    
+    private static RBGParserWrapper instance;
 
     /**
      * @param args the command line arguments
@@ -146,6 +149,28 @@ public class RBGParserWrapper {
     }
 
     
+    public static synchronized RBGParserWrapper getInstance() throws Exception{
+        if (instance == null) {
+            instance = new RBGParserWrapper();
+        }
+        return instance;
+    }
+    
+    
+    public static ArrayList<String> processLine(String line) throws IOException, Exception{
+        ArrayList<String> results = new ArrayList<String>();
+        ArrayList<String> segmentedLine = farasa.segmentLine(line);
+        Sentence POSLine = farasaPOS.tagLine(segmentedLine);
+        ArrayList<String> formatLine =  conll06_format(POSLine,segmentedLine,farasa);
+        ArrayList<String> output = RBGParser.classifySentences(true, formatLine);
+        int idx = 0;
+            for(String s : output){
+                if(s.length()>0){
+                results.add(s+","+formatLine.get(idx++));
+                }
+            }
+        return results;
+    }
     
     private static ArrayList<String> callSegmenter(String line, Farasa tagger) throws IOException{
         return tagger.segmentLine(line);
