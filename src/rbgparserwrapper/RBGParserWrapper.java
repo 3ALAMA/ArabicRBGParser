@@ -37,6 +37,7 @@ public class RBGParserWrapper {
     //public static ArabicNER ner;
     //public static DiacritizeText dt;
     public static DependencyParser RBGParser;
+    public static Options options;
     public static String[] RBGs;
     private static ArrayList<String>[] ResData;
     
@@ -98,13 +99,12 @@ public class RBGParserWrapper {
         //ner = new ArabicNER(farasa, farasaPOS);
         //dt = new DiacritizeText(farasa, farasaPOS);
 
-        Options options = new Options();
+        options = new Options();
         options.processArguments(RBGs);
-        DependencyParser pruner = null;
-        DependencyParser parser = new DependencyParser();
-        parser.options = options;	
-        parser.loadModel();
-        parser.options.processArguments(RBGs);
+        RBGParser = new DependencyParser();
+        RBGParser.options = options;	
+        RBGParser.loadModel();
+        RBGParser.options.processArguments(RBGs);
 
         System.out.print("\r");
         System.out.println("System ready!               ");
@@ -121,24 +121,31 @@ public class RBGParserWrapper {
         while ((line = ffile.readLine()) != null)
         //for (String line = ffile.readLine(); line != null; line = ffile.readLine()) 
         {
-            //System.err.println("Processing line:"+line+"\n--------------------");
-            segmentedline = callSegmenter(line, farasa);
-            POSline = callPOSTagger(segmentedline,farasaPOS);
-            POSres = formatPOS(POSline);
-            conll06txt = conll06_format(POSline,segmentedline,farasa);
-            output = parser.classifySentences(true, conll06txt);
-
-            int idx = 0;
-            for(String s : output){
-                
-                bw.write(s);
-                if(s.length()>0){
-                    bw.write("\t"+POSres.get(idx++)+"\n");
-                    //System.out.println(s+" = "+POSres.get(idx-1));
+//            //System.err.println("Processing line:"+line+"\n--------------------");
+//            segmentedline = callSegmenter(line, farasa);
+//            POSline = callPOSTagger(segmentedline,farasaPOS);
+//            POSres = formatPOS(POSline);
+//            conll06txt = conll06_format(POSline,segmentedline,farasa);
+//            output = parser.classifySentences(true, conll06txt);
+//
+//            int idx = 0;
+//            for(String s : output){
+//                
+//                bw.write(s);
+//                if(s.length()>0){
+//                    bw.write("\t"+POSres.get(idx++)+"\n");
+//                    //System.out.println(s+" = "+POSres.get(idx-1));
+//                } else{
+//                     bw.write("\n");
+//                }
+//            }
+                if(line.length()>0) {
+               output = processLine(line);
+               for (String s : output)
+                    bw.write(s+"\n");
                 } else{
-                     bw.write("\n");
+                    bw.write("\n");
                 }
-            }
         }
 
         ffile.close();
@@ -151,25 +158,26 @@ public class RBGParserWrapper {
     
     public static synchronized RBGParserWrapper getInstance() throws Exception{
         if (instance == null) {
-            instance = new RBGParserWrapper();
+            farasa = new Farasa();
+            farasaPOS = new FarasaPOSTagger(farasa);
+            options = new Options();
+            options.processArguments(RBGs);
+            RBGParser = new DependencyParser();
+            RBGParser.options = options;	
+            RBGParser.loadModel();
+            RBGParser.options.processArguments(RBGs);
         }
         return instance;
     }
     
     
     public static ArrayList<String> processLine(String line) throws IOException, Exception{
-        ArrayList<String> results = new ArrayList<String>();
+      
         ArrayList<String> segmentedLine = farasa.segmentLine(line);
         Sentence POSLine = farasaPOS.tagLine(segmentedLine);
         ArrayList<String> formatLine =  conll06_format(POSLine,segmentedLine,farasa);
-        ArrayList<String> output = RBGParser.classifySentences(true, formatLine);
-        int idx = 0;
-            for(String s : output){
-                if(s.length()>0){
-                results.add(s+","+formatLine.get(idx++));
-                }
-            }
-        return results;
+        return RBGParser.classifySentences(true, formatLine);
+        
     }
     
     private static ArrayList<String> callSegmenter(String line, Farasa tagger) throws IOException{
